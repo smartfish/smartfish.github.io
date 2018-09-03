@@ -1,1 +1,10 @@
 theme: jekyll-theme-architect
+
+title: smartfish Blog
+SEOTitle: smartfish Blog
+description: "Nothing to say"
+
+github_username: smartfish
+# weibo_username: smartfish
+
+paginate: 10
