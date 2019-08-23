@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://yudongliang.cn/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/tags/dovecot/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/topics/mta/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/tags/postfix/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/2019/08/24/postfix-dovecot-%E9%82%AE%E4%BB%B6%E8%BD%AC%E5%8F%91/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/post/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/tags/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/topics/</loc>
+    <lastmod>2019-08-24T01:54:41+08:00</lastmod>
+  </url>
+  
+</urlset>

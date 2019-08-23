@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>postfix &#43; dovecot 邮件转发  &middot; 于东亮的整理箱</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="MTA, ssl, postfix, dovecot, ">
+
+
+<meta property="og:title" content="postfix &#43; dovecot 邮件转发  &middot; 于东亮的整理箱 ">
+<meta property="og:site_name" content="于东亮的整理箱"/>
+<meta property="og:url" content="https://yudongliang.cn/2019/08/24/postfix-dovecot-%E9%82%AE%E4%BB%B6%E8%BD%AC%E5%8F%91/" />
+<meta property="og:locale" content="cn">
+
+<meta property="content-source" content="post/postfix &#43; dovecot 邮件转发.md">
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2019-08-24T01:54:41&#43;08:00" />
+<meta property="og:article:modified_time" content="2019-08-24T01:54:41&#43;08:00" />
+
+  
+    
+<meta property="og:article:tag" content="MTA">
+    
+<meta property="og:article:tag" content="ssl">
+    
+<meta property="og:article:tag" content="postfix">
+    
+<meta property="og:article:tag" content="dovecot">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<meta name="twitter:creator" content="@" />
+<meta name="twitter:title" content="postfix &#43; dovecot 邮件转发" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://yudongliang.cn/2019/08/24/postfix-dovecot-%E9%82%AE%E4%BB%B6%E8%BD%AC%E5%8F%91/" />
+<meta name="twitter:domain" content="https://yudongliang.cn/">
+  
+
+  
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "postfix \x2b dovecot 邮件转发",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2019-08-24",
+    "description": "",
+    "wordCount":  5832 
+  }
+</script>
+  
+
+
+
+<link rel="canonical" href="https://yudongliang.cn/2019/08/24/postfix-dovecot-%E9%82%AE%E4%BB%B6%E8%BD%AC%E5%8F%91/" />
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/touch-icon-144-precomposed.png">
+<link rel="icon" href="/favicon.png">
+<meta name="generator" content="Hugo 0.57.2" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+    
+
+
+
+<link rel="stylesheet" href="https://yudongliang.cn/css/bundle.min.bb13004e89c55229f44c28b053f616377d69e1f8c8fb51f4b31555c34de1f5f2588b9179ed4bd8778aa56ea6f9c714a3fa539260d6bd66ec73fda2a289fa2104.css" >
+
+</head>
+<body data-ng-app="myapp" data-ng-controller="MyController" data-ng-mouseleave="MouseLeave($event)">
+    <header id="main-header">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        
+          
+          <a class="navbar-brand-img" href="/">
+            <img alt="smartfish blog" src="http://blog.appernetic.io/images/apperneticlogo.png">
+            
+          </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            
+            
+            <li class="">
+              
+		<a href="https://yudongliang.cn/"  title="首页">
+                  <i class='fa fa-home'></i>
+                  首页
+                </a>
+              
+            </li>
+            
+            <li class="">
+              
+		<a href="https://yudongliang.cn/post/"  title="文章">
+                  <i class='fa fa-file'></i>
+                  文章
+                </a>
+              
+            </li>
+            
+            <li class="">
+              
+		<a href="https://yudongliang.cn/code/"  title="代码片段">
+                  <i class='fa fa-code'></i>
+                  代码片段
+                </a>
+              
+            </li>
+            
+            <li class="">
+              
+		<a href="https://yudongliang.cn/collection/"  title="收集">
+                  <i class='fa fa-list'></i>
+                  收集
+                </a>
+              
+            </li>
+            
+            <li class="">
+              
+		<a href="https://github.com/smartfish"  title="github">
+                  <i class='fa fa-github'></i>
+                  github
+                </a>
+              
+            </li>
+            
+            <li class="">
+              
+		<a href="mailto:yudongliang@hotmail.com"  title="联系我">
+                  <i class='fa fa-at'></i>
+                  联系我
+                </a>
+              
+            </li>
+            
+            
+              
+          </ul>
+        </div>
+        
+      </div>
+    </nav>
+  </header>
+
+
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-9">
+
+
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <div class="title-metas text-center">
+
+    <h1>postfix &#43; dovecot 邮件转发
+</h1>
+
+    <div class="metas">
+<small>
+  <i class="fa fa-calendar"></i>
+  <time datetime="2019-08-24">24 Aug, 2019</time>
+</small>
+
+
+  <small>
+  &middot; Read in about 12 min
+  &middot; (5832 words)
+  &middot; 
+<span class="share-box">Share this on:
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-facebook-official "></i></a>
+
+    <a href="https://twitter.com/intent/tweet?text=postfix%20%2b%20dovecot%20%e9%82%ae%e4%bb%b6%e8%bd%ac%e5%8f%91&amp;url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-twitter"></i></a>
+
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-google-plus"></i></a>
+
+    <a href="http://www.reddit.com/submit?url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-reddit"></i></a>
+
+    <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f&amp;title=postfix%20%2b%20dovecot%20%e9%82%ae%e4%bb%b6%e8%bd%ac%e5%8f%91" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-linkedin"></i></a>
+
+    <a href="mailto:?subject=postfix%20%2b%20dovecot%20%e9%82%ae%e4%bb%b6%e8%bd%ac%e5%8f%91&amp;body=Check out this site https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" data-proofer-ignore=""><i class="fa fa-envelope"></i></a>
+  </span>
+
+  </small>
+
+<div class="margin-10">
+  <i class="fa fa-tags"></i>
+  
+  <a href="https://yudongliang.cn/tags/postfix" class="label label-primary">postfix</a>
+  
+  <a href="https://yudongliang.cn/tags/dovecot" class="label label-primary">dovecot</a>
+  
+
+
+</div>
+
+<br>
+</div>
+
+  </div>
+</div>
+
+
+      <div class="content">
+  
+
+<table>
+<thead>
+<tr>
+<th>修改时间</th>
+<th>修改人</th>
+<th>修改内容</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2019/08/21</td>
+<td>于东亮</td>
+<td>错误修改</td>
+</tr>
+
+<tr>
+<td>2019/08/17</td>
+<td>于东亮</td>
+<td>加入 <strong>配置说明</strong> 这一节</td>
+</tr>
+
+<tr>
+<td>2019/08/15</td>
+<td>于东亮</td>
+<td>多个 MTA 通过指定 MTA 转发</td>
+</tr>
+
+<tr>
+<td>2019/08/14</td>
+<td>于东亮</td>
+<td>两个 MTA 通过指定 MTA 转发</td>
+</tr>
+</tbody>
+</table>
+
+<p>[TOC]</p>
+
+<h2 id="测试要求">测试要求</h2>
+
+<p>各个 MTA 间通过加密通道转发。</p>
+
+<h2 id="系统拓扑">系统拓扑</h2>
+
+<pre><code class="language-dot">    digraph G {
+        a -&gt; r;
+        r -&gt; a;
+        b -&gt; r;
+        r -&gt; b;
+        c -&gt; r;
+        r -&gt; c;
+        a[label=&quot;MTA1&quot;]
+        b[label=&quot;MTA2&quot;]
+        c[label=&quot;MTA3&quot;]
+        r[label=&quot;MTA relay&quot;]
+    }
+</code></pre>
+
+<ul>
+<li>MTA1: 172.16.108.101，虚拟邮件域 vm1.vm。</li>
+<li>MTA2: 172.16.108.102，虚拟邮件域 vm2.vm。</li>
+<li>MTA3: 172.16.108.103，虚拟邮件域 vm3.vm。</li>
+<li>MTA relay: 172.16.108.100，虚拟邮件域 任意。</li>
+</ul>
+
+<h2 id="配置说明">配置说明</h2>
+
+<ul>
+<li>整个环境未配置 DNS，均使用 IP 直接访问。</li>
+<li>邮件域和主机的 <code>/etc/hostname</code> 没有关系。</li>
+<li>MTA1/MTA2/MTA3 分别在三个不同的邮件域中。</li>
+<li>MTA1/MTA2/MTA3 都通过 MTA relay 转发邮件。</li>
+<li>使用 postfix 作为 MTA 进行邮件发送和转发。</li>
+</ul>
+
+<h3 id="邮件账号为虚拟账号">邮件账号为虚拟账号</h3>
+
+<ul>
+<li>dovecot 使用 <code>/etc/dovecot/conf.d/auth-passwdfile.conf.ext</code> 来指定账号密码文件。</li>
+<li>postfix 使用 <code>/etc/postfix/main.cf</code> 中的 virtual_mailbox_maps 来指定账号文件。</li>
+<li>需要认证的账号，postfix 和 dovecot 中必须配置一致。</li>
+</ul>
+
+<h3 id="postfix-的投递和转发">postfix 的投递和转发</h3>
+
+<ul>
+<li>postfix 使用 <code>/etc/postfix/main.cf</code> 中的 mydestination 和 virtual_mailbox_domains 来区分本地投递还是转发：
+
+<ul>
+<li>包含在 mydestination 或者 virtual_mailbox_domains 的地址投递到本地。</li>
+<li>其他地址转发到下一跳。</li>
+</ul></li>
+<li>postfix 使用 <code>/etc/postfix/main.cf</code> 中的 transport_maps 和 relayhost 指定下一跳的地址：
+
+<ul>
+<li>包含在 transport_maps 中的地址，根据 transport_maps 中定义的映射转发。</li>
+<li>其他地址都转发给默认的 relayhost。</li>
+</ul></li>
+</ul>
+
+<h3 id="mta1-mta2-mta3-上的-postfix-使用-dovecot-的-sasl-认证">MTA1/MTA2/MTA3 上的 postfix 使用 dovecot 的 sasl 认证</h3>
+
+<ul>
+<li><p>dovecot 在 <code>/etc/dovecot/conf.d/10-master.conf</code> 中打开对 postfix 的支持</p>
+
+<pre><code class="language-vim">service auth {
+    unix_listener /var/spool/postfix/private/auth {
+        mode = 0666
+    }
+}
+</code></pre></li>
+
+<li><p>postfix 使用 <code>/etc/postfix/main.cf</code> 指定使用 dovecot 的 sasl 认证</p>
+
+<pre><code class="language-vim">smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+</code></pre></li>
+
+<li><p>dovecot 和 postfix 中的 sasl path 必须配置一致。</p></li>
+</ul>
+
+<h3 id="mta-relay-配置为无认证转发">MTA relay 配置为无认证转发</h3>
+
+<p>postfix 在 <code>/etc/postfix/main.cf</code> 中指定可转发范围</p>
+
+<pre><code class="language-vim">relay_domains = vm1.vm, vm2.vm, vm3.vm
+</code></pre>
+
+<h3 id="postfix-加密传输约束">postfix 加密传输约束</h3>
+
+<p>在 <code>/etc/postfix/main.cf</code> 中
+* 强制加密接收</p>
+
+<pre><code class="language-vim">    smtpd_tls_security_level = encrypt
+</code></pre>
+
+<ul>
+<li><p>优先加密接收，协商失败转明文</p>
+
+<pre><code class="language-vim">smtpd_tls_security_level = may
+</code></pre></li>
+
+<li><p>强制加密中转</p>
+
+<pre><code class="language-vim">smtp_tls_security_level = encrypt
+</code></pre></li>
+
+<li><p>优先加密中转，协商失败转明文</p>
+
+<pre><code class="language-vim">smtp_tls_security_level = may
+</code></pre></li>
+</ul>
+
+<h3 id="postfix-发送认证约束">postfix 发送认证约束</h3>
+
+<p>在 <code>/etc/postfix/main.cf</code> 中
+* 非本地发送需要认证</p>
+
+<pre><code class="language-vim">    smtpd_sender_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+</code></pre>
+
+<ul>
+<li><p>去除本地无认证特权</p>
+
+<pre><code class="language-vim">local_recipient_maps = ... (TBD)
+</code></pre></li>
+</ul>
+
+<h3 id="postfix-转发约束">postfix 转发约束</h3>
+
+<p>在 <code>/etc/postfix/main.cf</code> 中</p>
+
+<pre><code class="language-vim">smtpd_relay_restrictions = permit_auth_destination, reject
+</code></pre>
+
+<h3 id="dovecot-加密连接约束">dovecot 加密连接约束</h3>
+
+<p>在 <code>/etc/dovecot/conf.d/10-ssl.conf</code> 中
+* 明文连接</p>
+
+<pre><code class="language-vim">    ssl = no
+</code></pre>
+
+<ul>
+<li><p>强制加密连接</p>
+
+<pre><code class="language-vim">ssl = required
+</code></pre></li>
+
+<li><p>明文/加密均可</p>
+
+<pre><code class="language-vim">ssl = yes
+</code></pre></li>
+</ul>
+
+<h3 id="postfix-smtp-smtps-连接测试">postfix smtp/smtps 连接测试</h3>
+
+<ul>
+<li><p>明文连接</p>
+
+<pre><code class="language-shell">telnet 127.0.0.1 25
+telnet 127.0.0.1 587
+</code></pre></li>
+
+<li><p>加密连接</p>
+
+<pre><code class="language-shell">openssl s_client -starttls smtp -crlf -connect 127.0.0.1:25
+openssl s_client -starttls smtp -crlf -connect 127.0.0.1:587
+openssl s_client -crlf -connect 127.0.0.1:465
+</code></pre></li>
+</ul>
+
+<h3 id="dovecot-pop3-pop3s-连接测试">dovecot pop3/pop3s 连接测试</h3>
+
+<ul>
+<li><p>明文连接</p>
+
+<pre><code class="language-shell">telnet 127.0.0.1 110
+</code></pre></li>
+
+<li><p>加密连接</p>
+
+<pre><code class="language-shell">openssl s_client -starttls pop3 -crlf -connect 127.0.0.1:110
+openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+</ul>
+
+<h2 id="软件版本">软件版本</h2>
+
+<ul>
+<li><p>MTA1/MTA2/MTA3</p>
+
+<ul>
+<li>CentOS 7.4.1708</li>
+<li>postfix-2.10.1</li>
+<li>dovecot-2.2.36</li>
+<li>stunnel-4.56 (optional)</li>
+</ul></li>
+
+<li><p>MTA relay</p>
+
+<ul>
+<li>CentOS 7.4.1708</li>
+<li>postfix-3.4.6 （和我们自己保持相同的大版本）</li>
+</ul></li>
+</ul>
+
+<h2 id="测试账号">测试账号</h2>
+
+<ul>
+<li><p>邮件域 vm1.vm (MTA1)</p>
+
+<table>
+<thead>
+<tr>
+<th>账号</th>
+<th>密码</th>
+<th>账号 base64</th>
+<th>密码 base64</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>alice@vm1.vm</td>
+<td>alice</td>
+<td>YWxpY2VAdm0xLnZt</td>
+<td>YWxpY2U=</td>
+</tr>
+
+<tr>
+<td>test1@vm1.vm</td>
+<td>test1</td>
+<td>dGVzdDFAdm0xLnZt</td>
+<td>dGVzdDE=</td>
+</tr>
+</tbody>
+</table></li>
+
+<li><p>邮件域 vm2.vm (MTA2)</p>
+
+<table>
+<thead>
+<tr>
+<th>账号</th>
+<th>密码</th>
+<th>账号 base64</th>
+<th>密码 base64</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>bob@vm2.vm</td>
+<td>bob</td>
+<td>Ym9iQHZtMi52bQ==</td>
+<td>Ym9i</td>
+</tr>
+
+<tr>
+<td>test2@vm2.vm</td>
+<td>test2</td>
+<td>dGVzdDJAdm0yLnZt</td>
+<td>dGVzdDI=</td>
+</tr>
+</tbody>
+</table></li>
+
+<li><p>邮件域 vm3.vm (MTA3)</p>
+
+<table>
+<thead>
+<tr>
+<th>账号</th>
+<th>密码</th>
+<th>账号 base64</th>
+<th>密码 base64</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>alpha@vm3.vm</td>
+<td>alpha</td>
+<td>YWxwaGFAdm0zLnZt</td>
+<td>YWxwaGE=</td>
+</tr>
+
+<tr>
+<td>beta@vm3.vm</td>
+<td>beta</td>
+<td>YmV0YUB2bTMudm0=</td>
+<td>YmV0YQ==</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+
+<h2 id="mta1">MTA1</h2>
+
+<h3 id="安装相关组件">安装相关组件</h3>
+
+<pre><code class="language-shell">    yum install -y postfix dovecot stunnel telnet
+</code></pre>
+
+<ul>
+<li><p>MTA 间通过 smtps/465 转发</p>
+
+<ul>
+<li>postfix 2.x 不支持，需要使用 stunnel 转发。</li>
+<li>postfix 3.x 支持。</li>
+</ul></li>
+
+<li><p>MTA 间通过端口 <sup>25</sup>&frasl;<sub>587</sub> 转发</p>
+
+<ul>
+<li>postfix <sup>2</sup>&frasl;<sub>3</sub> 都支持 STARTTLS。</li>
+</ul></li>
+
+<li><p>如果不是指定<strong>必须</strong>使用 smtps/465 转发，stunnel 可以不装。</p></li>
+
+<li><p>telnet 用来做简单测试，可以不装。</p></li>
+</ul>
+
+<h3 id="放置-postfix-dovecot-使用的证书">放置 postfix/dovecot 使用的证书</h3>
+
+<p>把预先生成的 ca.crt, mta1.crt, mta1.key 拷贝到 <code>/etc/pki/mail/</code> 目录下。
+<em>如何生成服务器证书请自行查阅其他参考资料</em></p>
+
+<h3 id="配置-dovecot">配置 dovecot</h3>
+
+<ul>
+<li><p>使用虚拟账号</p>
+
+<ul>
+<li><p>编辑 /etc/dovecot/vusers <code>vi /etc/dovecot/vusers</code>，加入 vm1.vm 域中的账号</p>
+
+<pre><code class="language-vim">alice@vm1.vm:{Plain}alice::::::
+test1@vm1.vm:{Plain}test1::::::
+</code></pre></li>
+
+<li><p>创建系统邮件用户，postfix/dovecot 使用此系统用户进行邮件读写</p>
+
+<pre><code class="language-shell">groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/mail/vhosts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-auth.conf <code>vi /etc/dovecot/conf.d/10-auth.conf</code></p>
+
+<pre><code class="language-vim"># line 10，启用 PLAIN/LOGIN
+disable_plaintext_auth = no
+# line 100，增加 login 方式认证
+auth_mechanisms = plain login
+# line 122，注释掉，关闭系统账号认证
+#!include auth-system.conf.ext
+# line 125，打开注释，设置虚拟账号
+!include auth-passwdfile.conf.ext
+# line 128，打开注释，设置系统邮件用户
+!include auth-static.conf.ext
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-mail.conf <code>vi /etc/dovecot/conf.d/10-mail.conf</code></p>
+
+<pre><code class="language-vim"># line 30，设置虚拟账号邮件存储位置
+mail_location = maildir:/var/mail/vhosts/%d/%n
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-master.conf <code>vi /etc/dovecot/conf.d/10-master.conf</code></p>
+
+<pre><code class="language-vim"># line 96 - 98，打开注释，为 postfix 提供认证支持
+    unix_listener /var/spool/postfix/private/auth {
+        mode = 0666
+    }
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-ssl.conf <code>vi /etc/dovecot/conf.d/10-ssl.conf</code></p>
+
+<pre><code class="language-vim"># line 14 - 15，指定 ssl 使用的证书
+ssl_cert = &lt;/etc/pki/mail/mta1.crt
+ssl_key = &lt;/etc/pki/mail/mta1.key
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/auth-passwdfile.conf.ext <code>vi /etc/dovecot/conf.d/auth-passwdfile.conf.ext</code></p>
+
+<pre><code class="language-vim"># line 8，指定虚拟账号密码文件
+    args = /etc/dovecot/vusers
+# line 11 - 20，注释掉 userdb 这一节
+#userdb {
+# ...
+#}
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/auth-static.conf.ext <code>vi /etc/dovecot/conf.d/auth-static.conf.ext</code></p>
+
+<pre><code class="language-vim"># line 21 - 24，指定 dovecot 使用的系统用户，以及虚拟账号的邮件存储位置
+userdb {
+    driver = static
+    args = uid=vmail gid=vmail home=/var/mail/vhosts/%d/%n
+}
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=110/tcp --permanent
+firewall-cmd --add-port=143/tcp --permanent
+firewall-cmd --add-port=993/tcp --permanent
+firewall-cmd --add-port=995/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable dovecot
+systemctl restart dovecot
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status dovecot
+# 正常时存在 active (running) 字样
+ss -tnlp | grep dovecot
+# 正常时存在端口 110/995
+</code></pre></li>
+
+<li><p>虚拟账号检查</p>
+
+<pre><code class="language-shell">doveadm user alice@vm1.vm
+doveadm user test1@vm1.vm
+</code></pre></li>
+</ul>
+
+<h3 id="配置-postfix">配置 postfix</h3>
+
+<ul>
+<li><p>使用虚拟账号</p>
+
+<ul>
+<li><p>编辑 /etc/postfix/vusers <code>vi /etc/postfix/vusers</code>，加入 vm1.vm 域中的账号</p>
+
+<pre><code class="language-vim">alice@vm1.vm vm1.vm/alice/
+test1@vm1.vm vm1.vm/test1/
+</code></pre></li>
+
+<li><p>生成 /etc/postfix/vusers.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/vusers
+</code></pre></li>
+</ul></li>
+
+<li><p>配置转发规则
+<em>只有一个转发目的地的时候，也可以直接设置</em> <strong>relayhost</strong></p>
+
+<ul>
+<li><p>编辑 /etc/postfix/ts <code>vi /etc/postfix/ts</code></p>
+
+<ul>
+<li><p>smtps/465，使用 stunnel 转发</p>
+
+<pre><code class="language-vim"># 转发本地 stunnel
+vm2.vm  relay:127.0.0.1:25000
+vm3.vm  relay:127.0.0.1:25000
+</code></pre></li>
+
+<li><p>端口 25/587，可以 STARTTLS 转加密</p>
+
+<pre><code class="language-vim"># 直接转发 MTA relay
+vm2.vm  relay:172.16.108.100
+vm3.vm  relay:172.16.108.100
+#vm2.vm  relay:172.16.108.100:587
+#vm3.vm  relay:172.16.108.100:587
+</code></pre></li>
+</ul></li>
+
+<li><p>生成 /etc/postfix/ts.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/ts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/postfix/main.cf <code>vi /etc/postfix/main.cf</code></p>
+
+<pre><code class="language-vim"># line 76，设置主机名 [非必须]
+myhostname = mta1.vm1.vm
+# line 83，邮件域
+mydomain = vm1.vm
+# line 99
+myorigin = $mydomain
+# line 113, 116，监听所有地址
+inet_interfaces = all
+#inet_interfaces = localhost
+# -- 追加 --
+# 邮件最大尺寸 50M
+message_size_limit = 52428800
+# 邮箱 1G
+mailbox_size_limit = 1073741824
+# 虚拟用户
+virtual_mailbox_domains = $mydomain
+virtual_mailbox_base = /var/mail/vhosts
+virtual_mailbox_maps = hash:/etc/postfix/vusers
+virtual_mailbox_limit = $mailbox_size_limit
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000  
+# dovecot sasl auth
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_local_domain = $mydomain
+smtpd_sender_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+smtpd_recipient_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+broken_sasl_auth_clients = yes
+# 转发规则
+transport_maps = hash:/etc/postfix/ts
+# smtpd tls support
+smtpd_use_tls = yes
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+smtpd_tls_loglevel = 1
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_CAfile = /etc/pki/mail/ca.crt  
+smtpd_tls_key_file = /etc/pki/mail/mta1.key
+smtpd_tls_cert_file = /etc/pki/mail/mta1.crt
+# smtp 转发 tls support
+smtp_use_tls = yes
+smtp_tls_security_level = encrypt
+smtp_tls_loglevel = 1
+smtp_tls_note_starttls_offer = yes  
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+</code></pre></li>
+
+<li><p>编辑 /etc/postfix/master.cf <code>vi /etc/postfix/master.cf</code>
+<em>可以使用 smtpd -v 记录更详细的日志</em></p>
+
+<pre><code class="language-vim"># line 11，打开端口 25
+smtp      inet  n       -       n       -       -       smtpd
+# line 16，打开端口 587
+submission inet n       -       n       -       -       smtpd
+# line 26，打开端口 465
+smtps     inet  n       -       n       -       -       smtpd
+# line 28，stmp over tls support
+    -o smtpd_tls_wrappermode=yes
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=25/tcp --permanent
+firewall-cmd --add-port=465/tcp --permanent
+firewall-cmd --add-port=587/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable postfix
+systemctl restart postfix
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status postfix
+# 正常时存在 active (running) 字样
+ss -tlnp | grep master
+# 正常时存在端口 25/465/587
+</code></pre></li>
+</ul>
+
+<h3 id="本机收发邮件检查">本机收发邮件检查</h3>
+
+<ul>
+<li><p>alice 发送给 test1</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta1&quot;
+  echo &quot;auth login&quot;
+  echo &quot;YWxpY2VAdm0xLnZt&quot;
+  echo &quot;YWxpY2U=&quot;
+  echo &quot;mail from: alice&quot;
+  echo &quot;rcpt to: test1&quot;
+  echo &quot;data&quot;
+  echo &quot;from: alice&quot;
+  echo &quot;to: test1&quot;
+  echo &quot;subject: alice to test1 on mta1&quot;
+  echo &quot;alice say hello to test1&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:465
+</code></pre></li>
+
+<li><p>查看 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>test1 查询邮件列表</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user test1@vm1.vm&quot;
+  echo &quot;pass test1&quot;
+  echo &quot;list&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+
+<li><p>test1 查看第一封邮件</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user test1@vm1.vm&quot;
+  echo &quot;pass test1&quot;
+  echo &quot;retr 1&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+</ul>
+
+<h3 id="配置-stunnel">配置 stunnel</h3>
+
+<ul>
+<li><p>编辑 /etc/stunnel/stunnel.conf <code>vi /etc/stunnel/stunnel.conf</code>，转发到 MTA relay 的 smtps/465</p>
+
+<pre><code class="language-vim">[local-smtp-to-mta-smtps]
+accept = 25000
+client = yes
+connect = 172.16.108.100:465
+</code></pre></li>
+
+<li><p>启动 stunnel</p>
+
+<pre><code class="language-shell">stunnel
+</code></pre></li>
+
+<li><p>状态检查</p>
+
+<pre><code class="language-shell">ps -aux | grep stunnel
+# 正常时存在多个 stunnel 实例
+</code></pre></li>
+</ul>
+
+<h2 id="mta2">MTA2</h2>
+
+<h3 id="安装相关组件-1">安装相关组件</h3>
+
+<pre><code class="language-shell">    yum install -y postfix dovecot stunnel telnet
+</code></pre>
+
+<ul>
+<li><p>MTA 间通过 smtps/465 转发</p>
+
+<ul>
+<li>postfix 2.x 不支持，需要使用 stunnel 转发。</li>
+<li>postfix 3.x 支持。</li>
+</ul></li>
+
+<li><p>MTA 间通过端口 <sup>25</sup>&frasl;<sub>587</sub> 转发</p>
+
+<ul>
+<li>postfix <sup>2</sup>&frasl;<sub>3</sub> 都支持 STARTTLS。</li>
+</ul></li>
+
+<li><p>如果不是指定<strong>必须</strong>使用 smtps/465 转发，stunnel 可以不装。</p></li>
+
+<li><p>telnet 用来做简单测试，可以不装。</p></li>
+</ul>
+
+<h3 id="放置-postfix-dovecot-使用的证书-1">放置 postfix/dovecot 使用的证书</h3>
+
+<p>把预先生成的 ca.crt, mta2.crt, mta2.key 拷贝到 <code>/etc/pki/mail/</code> 目录下。
+<em>如何生成服务器证书请自行查阅其他参考资料</em></p>
+
+<h3 id="配置-dovecot-1">配置 dovecot</h3>
+
+<ul>
+<li><p>使用虚拟账号</p>
+
+<ul>
+<li><p>编辑 /etc/dovecot/vusers <code>vi /etc/dovecot/vusers</code>，加入 vm2.vm 域中的账号</p>
+
+<pre><code class="language-vim">bob@vm2.vm:{Plain}bob::::::
+test2@vm2.vm:{Plain}test2::::::
+</code></pre></li>
+
+<li><p>创建系统邮件用户，postfix/dovecot 使用此系统用户进行邮件读写</p>
+
+<pre><code class="language-shell">groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/mail/vhosts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-auth.conf <code>vi /etc/dovecot/conf.d/10-auth.conf</code></p>
+
+<pre><code class="language-vim"># line 10，启用 PLAIN/LOGIN
+disable_plaintext_auth = no
+# line 100，增加 login 方式认证
+auth_mechanisms = plain login
+# line 122，注释掉，关闭系统账号认证
+#!include auth-system.conf.ext
+# line 125，打开注释，设置虚拟账号
+!include auth-passwdfile.conf.ext
+# line 128，打开注释，设置系统邮件用户
+!include auth-static.conf.ext
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-mail.conf <code>vi /etc/dovecot/conf.d/10-mail.conf</code></p>
+
+<pre><code class="language-vim"># line 30，设置虚拟账号邮件存储位置
+mail_location = maildir:/var/mail/vhosts/%d/%n
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-master.conf <code>vi /etc/dovecot/conf.d/10-master.conf</code></p>
+
+<pre><code class="language-vim"># line 96 - 98，打开注释，为 postfix 提供认证支持
+    unix_listener /var/spool/postfix/private/auth {
+        mode = 0666
+    }
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-ssl.conf <code>vi /etc/dovecot/conf.d/10-ssl.conf</code></p>
+
+<pre><code class="language-vim"># line 14 - 15，指定 ssl 使用的证书
+ssl_cert = &lt;/etc/pki/mail/mta2.crt
+ssl_key = &lt;/etc/pki/mail/mta2.key
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/auth-passwdfile.conf.ext <code>vi /etc/dovecot/conf.d/auth-passwdfile.conf.ext</code></p>
+
+<pre><code class="language-vim"># line 8，指定虚拟账号密码文件
+    args = /etc/dovecot/vusers
+# line 11 - 20，注释掉 userdb 这一节
+#userdb {
+# ...
+#}
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/auth-static.conf.ext <code>vi /etc/dovecot/conf.d/auth-static.conf.ext</code></p>
+
+<pre><code class="language-vim"># line 21 - 24，指定 dovecot 使用的系统用户，以及虚拟账号的邮件存储位置
+userdb {
+    driver = static
+    args = uid=vmail gid=vmail home=/var/mail/vhosts/%d/%n
+}
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=110/tcp --permanent
+firewall-cmd --add-port=143/tcp --permanent
+firewall-cmd --add-port=993/tcp --permanent
+firewall-cmd --add-port=995/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable dovecot
+systemctl restart dovecot
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status dovecot
+# 正常时存在 active (running) 字样
+ss -tnlp | grep dovecot
+# 正常时存在端口 110/995
+</code></pre></li>
+
+<li><p>虚拟账号检查</p>
+
+<pre><code class="language-shell">doveadm user bob@vm2.vm
+doveadm user test2@vm2.vm
+</code></pre></li>
+</ul>
+
+<h3 id="配置-postfix-1">配置 postfix</h3>
+
+<ul>
+<li><p>使用虚拟账号</p>
+
+<ul>
+<li><p>编辑 /etc/postfix/vusers <code>vi /etc/postfix/vusers</code>，加入 vm2.vm 域中的账号</p>
+
+<pre><code class="language-vim">bob@vm2.vm vm2.vm/bob/
+test2@vm2.vm vm2.vm/test2/
+</code></pre></li>
+
+<li><p>生成 /etc/postfix/vusers.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/vusers
+</code></pre></li>
+</ul></li>
+
+<li><p>配置转发规则
+<em>只有一个转发目的地的时候，也可以直接设置</em> <strong>relayhost</strong></p>
+
+<ul>
+<li><p>编辑 /etc/postfix/ts <code>vi /etc/postfix/ts</code></p>
+
+<ul>
+<li><p>smtps/465，使用 stunnel 转发</p>
+
+<pre><code class="language-vim"># 转发本地 stunnel
+vm2.vm  relay:127.0.0.1:25000
+vm3.vm  relay:127.0.0.1:25000
+</code></pre></li>
+
+<li><p>端口 25/587，可以 STARTTLS 转加密</p>
+
+<pre><code class="language-vim"># 直接转发 MTA relay
+vm1.vm  relay:172.16.108.100
+vm3.vm  relay:172.16.108.100
+#vm1.vm  relay:172.16.108.100:587
+#vm3.vm  relay:172.16.108.100:587
+</code></pre></li>
+</ul></li>
+
+<li><p>生成 /etc/postfix/ts.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/ts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/postfix/main.cf <code>vi /etc/postfix/main.cf</code></p>
+
+<pre><code class="language-vim"># line 76，设置主机名 [非必须]
+myhostname = mta2.vm2.vm
+# line 83，邮件域
+mydomain = vm2.vm
+# line 99
+myorigin = $mydomain
+# line 113, 116，监听所有地址
+inet_interfaces = all
+#inet_interfaces = localhost
+# -- 追加 --
+# 邮件最大尺寸 50M
+message_size_limit = 52428800
+# 邮箱 1G
+mailbox_size_limit = 1073741824
+# 虚拟用户
+virtual_mailbox_domains = $mydomain
+virtual_mailbox_base = /var/mail/vhosts
+virtual_mailbox_maps = hash:/etc/postfix/vusers
+virtual_mailbox_limit = $mailbox_size_limit
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000  
+# dovecot sasl auth
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_local_domain = $mydomain
+smtpd_sender_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+smtpd_recipient_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+broken_sasl_auth_clients = yes
+# 转发规则
+transport_maps = hash:/etc/postfix/ts
+# smtpd tls support
+smtpd_use_tls = yes
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+smtpd_tls_loglevel = 1
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_CAfile = /etc/pki/mail/ca.crt  
+smtpd_tls_key_file = /etc/pki/mail/mta2.key
+smtpd_tls_cert_file = /etc/pki/mail/mta2.crt
+# smtp 转发 tls support
+smtp_use_tls = yes
+smtp_tls_security_level = encrypt
+smtp_tls_loglevel = 1
+smtp_tls_note_starttls_offer = yes  
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+</code></pre></li>
+
+<li><p>编辑 /etc/postfix/master.cf <code>vi /etc/postfix/master.cf</code>
+<em>可以使用 smtpd -v 记录更详细的日志</em></p>
+
+<pre><code class="language-vim"># line 11，打开端口 25
+smtp      inet  n       -       n       -       -       smtpd
+# line 16，打开端口 587
+submission inet n       -       n       -       -       smtpd
+# line 26，打开端口 465
+smtps     inet  n       -       n       -       -       smtpd
+# line 28，stmp over tls support
+    -o smtpd_tls_wrappermode=yes
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=25/tcp --permanent
+firewall-cmd --add-port=465/tcp --permanent
+firewall-cmd --add-port=587/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable postfix
+systemctl restart postfix
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status postfix
+# 正常时存在 active (running) 字样
+ss -tlnp | grep master
+# 正常时存在端口 25/465/587
+</code></pre></li>
+</ul>
+
+<h3 id="本机收发邮件检查-1">本机收发邮件检查</h3>
+
+<ul>
+<li><p>bob 发送给 test2</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta2&quot;
+  echo &quot;auth login&quot;
+  echo &quot;Ym9iQHZtMi52bQ==&quot;
+  echo &quot;Ym9i&quot;
+  echo &quot;mail from: bob&quot;
+  echo &quot;rcpt to: test2&quot;
+  echo &quot;data&quot;
+  echo &quot;from: bob&quot;
+  echo &quot;to: test2&quot;
+  echo &quot;subject: bob to test2 on mta2&quot;
+  echo &quot;bob say hello to test2&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:465
+</code></pre></li>
+
+<li><p>查看 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>test2 查询邮件列表</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user test2@vm2.vm&quot;
+  echo &quot;pass test2&quot;
+  echo &quot;list&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+
+<li><p>test2 查看第一封邮件</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user test2@vm2.vm&quot;
+  echo &quot;pass test2&quot;
+  echo &quot;retr 1&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+</ul>
+
+<h3 id="配置-stunnel-1">配置 stunnel</h3>
+
+<ul>
+<li><p>编辑 /etc/stunnel/stunnel.conf <code>vi /etc/stunnel/stunnel.conf</code>，转发到 MTA relay 的 smtps/465</p>
+
+<pre><code class="language-vim">[local-smtp-to-mta-smtps]
+accept = 25000
+client = yes
+connect = 172.16.108.100:465
+</code></pre></li>
+
+<li><p>启动 stunnel</p>
+
+<pre><code class="language-shell">stunnel
+</code></pre></li>
+
+<li><p>状态检查</p>
+
+<pre><code class="language-shell">ps -aux | grep stunnel
+# 正常时存在多个 stunnel 实例
+</code></pre></li>
+</ul>
+
+<h2 id="mta3">MTA3</h2>
+
+<h3 id="安装相关组件-2">安装相关组件</h3>
+
+<pre><code class="language-shell">    yum install -y postfix dovecot stunnel telnet
+</code></pre>
+
+<ul>
+<li><p>MTA 间通过 smtps/465 转发</p>
+
+<ul>
+<li>postfix 2.x 不支持，需要使用 stunnel 转发。</li>
+<li>postfix 3.x 支持。</li>
+</ul></li>
+
+<li><p>MTA 间通过端口 <sup>25</sup>&frasl;<sub>587</sub> 转发</p>
+
+<ul>
+<li>postfix <sup>2</sup>&frasl;<sub>3</sub> 都支持 STARTTLS。</li>
+</ul></li>
+
+<li><p>如果不是指定<strong>必须</strong>使用 smtps/465 转发，stunnel 可以不装。</p></li>
+
+<li><p>telnet 用来做简单测试，可以不装。</p></li>
+</ul>
+
+<h3 id="放置-postfix-dovecot-使用的证书-2">放置 postfix/dovecot 使用的证书</h3>
+
+<p>把预先生成的 ca.crt, mta3.crt, mta3.key 拷贝到 <code>/etc/pki/mail/</code> 目录下。
+<em>如何生成服务器证书请自行查阅其他参考资料</em></p>
+
+<h3 id="配置-dovecot-2">配置 dovecot</h3>
+
+<ul>
+<li><p>使用虚拟账号</p>
+
+<ul>
+<li><p>编辑 /etc/dovecot/vusers <code>vi /etc/dovecot/vusers</code>，加入 vm3.vm 域中的账号</p>
+
+<pre><code class="language-vim">alpha@vm3.vm:{Plain}alpha::::::
+beta@vm3.vm:{Plain}beta::::::
+</code></pre></li>
+
+<li><p>创建系统邮件用户，postfix/dovecot 使用此系统用户进行邮件读写</p>
+
+<pre><code class="language-shell">groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/mail/vhosts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-auth.conf <code>vi /etc/dovecot/conf.d/10-auth.conf</code></p>
+
+<pre><code class="language-vim"># line 10，启用 PLAIN/LOGIN
+disable_plaintext_auth = no
+# line 100，增加 login 方式认证
+auth_mechanisms = plain login
+# line 122，注释掉，关闭系统账号认证
+#!include auth-system.conf.ext
+# line 125，打开注释，设置虚拟账号
+!include auth-passwdfile.conf.ext
+# line 128，打开注释，设置系统邮件用户
+!include auth-static.conf.ext
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-mail.conf <code>vi /etc/dovecot/conf.d/10-mail.conf</code></p>
+
+<pre><code class="language-vim"># line 30，设置虚拟账号邮件存储位置
+mail_location = maildir:/var/mail/vhosts/%d/%n
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-master.conf <code>vi /etc/dovecot/conf.d/10-master.conf</code></p>
+
+<pre><code class="language-vim"># line 96 - 98，打开注释，为 postfix 提供认证支持
+    unix_listener /var/spool/postfix/private/auth {
+        mode = 0666
+    }
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/10-ssl.conf <code>vi /etc/dovecot/conf.d/10-ssl.conf</code></p>
+
+<pre><code class="language-vim"># line 14 - 15，指定 ssl 使用的证书
+ssl_cert = &lt;/etc/pki/mail/mta3.crt
+ssl_key = &lt;/etc/pki/mail/mta3.key
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/auth-passwdfile.conf.ext <code>vi /etc/dovecot/conf.d/auth-passwdfile.conf.ext</code></p>
+
+<pre><code class="language-vim"># line 8，指定虚拟账号密码文件
+    args = /etc/dovecot/vusers
+# line 11 - 20，注释掉 userdb 这一节
+#userdb {
+# ...
+#}
+</code></pre></li>
+
+<li><p>编辑 /etc/dovecot/conf.d/auth-static.conf.ext <code>vi /etc/dovecot/conf.d/auth-static.conf.ext</code></p>
+
+<pre><code class="language-vim"># line 21 - 24，指定 dovecot 使用的系统用户，以及虚拟账号的邮件存储位置
+userdb {
+    driver = static
+    args = uid=vmail gid=vmail home=/var/mail/vhosts/%d/%n
+}
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=110/tcp --permanent
+firewall-cmd --add-port=143/tcp --permanent
+firewall-cmd --add-port=993/tcp --permanent
+firewall-cmd --add-port=995/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable dovecot
+systemctl restart dovecot
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status dovecot
+# 正常时存在 active (running) 字样
+ss -tnlp | grep dovecot
+# 正常时存在端口 110/995
+</code></pre></li>
+
+<li><p>虚拟账号检查</p>
+
+<pre><code class="language-shell">doveadm user alpha@vm3.vm
+doveadm user beta@vm3.vm
+</code></pre></li>
+</ul>
+
+<h3 id="配置-postfix-2">配置 postfix</h3>
+
+<ul>
+<li><p>使用虚拟账号</p>
+
+<ul>
+<li><p>编辑 /etc/postfix/vusers <code>vi /etc/postfix/vusers</code>，加入 vm3.vm 域中的账号</p>
+
+<pre><code class="language-vim">alpha@vm3.vm vm3.vm/alpha/
+beta@vm3.vm vm3.vm/beta/
+</code></pre></li>
+
+<li><p>生成 /etc/postfix/vusers.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/vusers
+</code></pre></li>
+</ul></li>
+
+<li><p>配置转发规则
+<em>只有一个转发目的地的时候，也可以直接设置</em> <strong>relayhost</strong></p>
+
+<ul>
+<li><p>编辑 /etc/postfix/ts <code>vi /etc/postfix/ts</code></p>
+
+<ul>
+<li><p>smtps/465，使用 stunnel 转发</p>
+
+<pre><code class="language-vim"># 转发本地 stunnel
+vm1.vm  relay:127.0.0.1:25000
+vm2.vm  relay:127.0.0.1:25000
+</code></pre></li>
+
+<li><p>端口 25/587，可以 STARTTLS 转加密</p>
+
+<pre><code class="language-vim"># 直接转发 MTA relay
+vm1.vm  relay:172.16.108.100
+vm2.vm  relay:172.16.108.100
+#vm1.vm  relay:172.16.108.100:587
+#vm2.vm  relay:172.16.108.100:587
+</code></pre></li>
+</ul></li>
+
+<li><p>生成 /etc/postfix/ts.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/ts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/postfix/main.cf <code>vi /etc/postfix/main.cf</code></p>
+
+<pre><code class="language-vim"># line 76，设置主机名 [非必须]
+myhostname = mta3.vm3.vm
+# line 83，邮件域
+mydomain = vm3.vm
+# line 99
+myorigin = $mydomain
+# line 113, 116，监听所有地址
+inet_interfaces = all
+#inet_interfaces = localhost
+# -- 追加 --
+# 邮件最大尺寸 50M
+message_size_limit = 52428800
+# 邮箱 1G
+mailbox_size_limit = 1073741824
+# 虚拟用户
+virtual_mailbox_domains = $mydomain
+virtual_mailbox_base = /var/mail/vhosts
+virtual_mailbox_maps = hash:/etc/postfix/vusers
+virtual_mailbox_limit = $mailbox_size_limit
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000  
+# dovecot sasl auth
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_local_domain = $mydomain
+smtpd_sender_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+smtpd_recipient_restrictions = permit_auth_destination, permit_sasl_authenticated, reject
+broken_sasl_auth_clients = yes
+# 转发规则
+transport_maps = hash:/etc/postfix/ts
+# smtpd tls support
+smtpd_use_tls = yes
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+smtpd_tls_loglevel = 1
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_CAfile = /etc/pki/mail/ca.crt  
+smtpd_tls_key_file = /etc/pki/mail/mta3.key
+smtpd_tls_cert_file = /etc/pki/mail/mta3.crt
+# smtp 转发 tls support
+smtp_use_tls = yes
+smtp_tls_security_level = encrypt
+smtp_tls_loglevel = 1
+smtp_tls_note_starttls_offer = yes  
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+</code></pre></li>
+
+<li><p>编辑 /etc/postfix/master.cf <code>vi /etc/postfix/master.cf</code>
+<em>可以使用 smtpd -v 记录更详细的日志</em></p>
+
+<pre><code class="language-vim"># line 11，打开端口 25
+smtp      inet  n       -       n       -       -       smtpd
+# line 16，打开端口 587
+submission inet n       -       n       -       -       smtpd
+# line 26，打开端口 465
+smtps     inet  n       -       n       -       -       smtpd
+# line 28，stmp over tls support
+    -o smtpd_tls_wrappermode=yes
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=25/tcp --permanent
+firewall-cmd --add-port=465/tcp --permanent
+firewall-cmd --add-port=587/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable postfix
+systemctl restart postfix
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status postfix
+# 正常时存在 active (running) 字样
+ss -tlnp | grep master
+# 正常时存在端口 25/465/587
+</code></pre></li>
+</ul>
+
+<h3 id="本机收发邮件检查-2">本机收发邮件检查</h3>
+
+<ul>
+<li><p>alpha 发送给 beta</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta3&quot;
+  echo &quot;auth login&quot;
+  echo &quot;YWxpY2VAdm0xLnZt&quot;
+  echo &quot;YWxpY2U=&quot;
+  echo &quot;mail from: alpha&quot;
+  echo &quot;rcpt to: beta&quot;
+  echo &quot;data&quot;
+  echo &quot;from: alpha&quot;
+  echo &quot;to: beta&quot;
+  echo &quot;subject: alpha to beta on mta2&quot;
+  echo &quot;alpha say hello to beta&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:465
+</code></pre></li>
+
+<li><p>查看 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>beta 查询邮件列表</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user beta@vm3.vm&quot;
+  echo &quot;pass beta&quot;
+  echo &quot;list&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+
+<li><p>beta 查看第一封邮件</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user beta@vm3.vm&quot;
+  echo &quot;pass beta&quot;
+  echo &quot;retr 1&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:995
+</code></pre></li>
+</ul>
+
+<h3 id="配置-stunnel-2">配置 stunnel</h3>
+
+<ul>
+<li><p>编辑 /etc/stunnel/stunnel.conf <code>vi /etc/stunnel/stunnel.conf</code>，转发到 MTA relay 的 smtps/465</p>
+
+<pre><code class="language-vim">[local-smtp-to-mta-smtps]
+accept = 25000
+client = yes
+connect = 172.16.108.100:465
+</code></pre></li>
+
+<li><p>启动 stunnel</p>
+
+<pre><code class="language-shell">stunnel
+</code></pre></li>
+
+<li><p>状态检查</p>
+
+<pre><code class="language-shell">ps -aux | grep stunnel
+# 正常时存在多个 stunnel 实例
+</code></pre></li>
+</ul>
+
+<h2 id="mta-relay">MTA relay</h2>
+
+<h3 id="安装-postfix3">安装 postfix3</h3>
+
+<ul>
+<li><p>添加 gf 源</p>
+
+<pre><code class="language-shell">rpm -ivh http://mirror.ghettoforge.org/distributions/gf/gf-release-latest.gf.el7.noarch.rpm
+</code></pre></li>
+
+<li><p>移除默认安装的 postfix</p>
+
+<pre><code class="language-shell">yum remove -y postfix
+</code></pre></li>
+
+<li><p>指定 gf 源安装 postfix3</p>
+
+<pre><code class="language-shell">yum --enablerepo=gf-plus install -y postfix3
+</code></pre></li>
+</ul>
+
+<h3 id="放置-postfix使用的证书">放置 postfix使用的证书</h3>
+
+<p>把预先生成的 ca.crt, mta.crt, mta.key 拷贝到 <code>/etc/pki/mail/</code> 目录下。
+<em>如何生成服务器证书请自行查阅其他参考资料</em></p>
+
+<h3 id="配置-postfix3">配置 postfix3</h3>
+
+<ul>
+<li><p>转发设置
+<em>使用转发配置文件，不同的邮件域转发到对应的 MTA。</em></p>
+
+<ul>
+<li><p>编辑 /etc/postfix/ts <code>vi /etc/postfix/ts</code></p>
+
+<ul>
+<li><p>smtps/465</p>
+
+<pre><code class="language-vim">vm1.vm  relay-smtps:172.16.108.101
+vm2.vm  relay-stmps:172.16.108.102
+vm3.vm  relay-stmps:172.16.108.103
+</code></pre></li>
+
+<li><p>端口 25/587，STARTTLS</p>
+
+<pre><code class="language-vim">vm1.vm  relay:172.16.108.101
+vm2.vm  relay:172.16.108.102
+vm3.vm  relay:172.16.108.103
+</code></pre></li>
+</ul></li>
+
+<li><p>生成 /etc/postfix/ts.db</p>
+
+<pre><code class="language-shell">postmap /etc/postfix/ts
+</code></pre></li>
+</ul></li>
+
+<li><p>编辑 /etc/postfix/main.cf <code>vi /etc/postfix/main.cf</code></p>
+
+<pre><code class="language-vim"># line 95，设置主机名 [非必须]
+myhostname = mta.vm.vm
+# line 102，设置本机邮件域 [非必须]
+mydomain = vm.vm
+# line 132, 135，监听所有地址
+inet_interfaces = all
+#inet_interfaces = localhost
+# line 315，设置转发范围
+relay_domains = vm1.vm, vm2.vm, vm3.vm
+# -- 追加 --
+# 邮件 50M
+message_size_limit = 52428800
+# 邮箱 1G
+mailbox_size_limit = 1073741824
+# 转发映射
+transport_maps = hash:/etc/postfix/ts
+# smtpd tls support
+smtpd_use_tls = yes
+smtpd_tls_security_level = may
+smtpd_tls_loglevel = 1
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_CAfile = /etc/pki/mail/ca.crt  
+smtpd_tls_key_file = /etc/pki/mail/mta.key
+smtpd_tls_cert_file = /etc/pki/mail/mta.crt
+# smtp 转发 tls support
+smtp_use_tls = yes
+smtp_tls_security_level = encrypt
+smtp_tls_loglevel = 1
+smtp_tls_note_starttls_offer = yes  
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+</code></pre></li>
+
+<li><p>编辑 /etc/postfix/master.cf <code>vi /etc/postfix/master.cf</code>
+<em>可以使用 smtpd -v 记录更详细的日志</em></p>
+
+<pre><code class="language-vim"># line 12，打开端口 25
+smtp      inet  n       -       n       -       -       smtpd
+# line 17，打开端口 587
+submission inet n       -       n       -       -       smtpd
+# line 29，打开端口 465
+smtps     inet  n       -       n       -       -       smtpd
+# line 31 [非必须]
+    -o smtpd_tls_wrappermode=yes
+</code></pre></li>
+
+<li><p>打开防火墙相关端口</p>
+
+<pre><code class="language-shell">firewall-cmd --add-port=25/tcp --permanent
+firewall-cmd --add-port=465/tcp --permanent
+firewall-cmd --add-port=587/tcp --permanent
+firewall-cmd --reload
+</code></pre></li>
+
+<li><p>设置开机启动服务</p>
+
+<pre><code class="language-shell">systemctl enable postfix
+systemctl restart postfix
+</code></pre></li>
+
+<li><p>服务状态检查</p>
+
+<pre><code class="language-shell">systemctl status postfix
+# active (running)
+ss -tlnp | grep master
+# 端口 25/465
+</code></pre></li>
+</ul>
+
+<h2 id="跨域收发邮件检查">跨域收发邮件检查</h2>
+
+<h3 id="vm1-vm-vm2-vm">vm1.vm =&gt; vm2.vm</h3>
+
+<ul>
+<li><p>现在，alice 终于可以通过 MTA1 给 bob 发邮件了</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta1&quot;
+  echo &quot;auth login&quot;
+  echo &quot;YWxpY2VAdm0xLnZt&quot;
+  echo &quot;YWxpY2U=&quot;
+  echo &quot;mail from: alice&quot;
+  echo &quot;rcpt to: bob@vm2.vm&quot;
+  echo &quot;data&quot;
+  echo &quot;from: alice&quot;
+  echo &quot;to: bob@vm2.vm&quot;
+  echo &quot;subject: alice to bob&quot;
+  echo &quot;alice say hello to bob&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.101:465
+</code></pre></li>
+
+<li><p>查看 172.16.108.101 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>查看 172.16.108.100 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>查看 172.16.108.102 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>bob 在 MTA2 上查询邮件列表</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user bob@vm2.vm&quot;
+  echo &quot;pass bob&quot;
+  echo &quot;list&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.102:995
+</code></pre></li>
+
+<li><p>bob 在 MTA2 上查看第一封邮件</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user bob@vm2.vm&quot;
+  echo &quot;pass bob&quot;
+  echo &quot;retr 1&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.102:995
+</code></pre></li>
+</ul>
+
+<h3 id="vm2-vm-vm3-vm">vm2.vm =&gt; vm3.vm</h3>
+
+<ul>
+<li><p>尝试 bob 通过 MTA2 发送给 beta</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta2&quot;
+  echo &quot;auth login&quot;
+  echo &quot;Ym9iQHZtMi52bQ==&quot;
+  echo &quot;Ym9i&quot;
+  echo &quot;mail from: bob&quot;
+  echo &quot;rcpt to: beta@vm3.vm&quot;
+  echo &quot;data&quot;
+  echo &quot;from: bob&quot;
+  echo &quot;to: beta@vm3.vm&quot;
+  echo &quot;subject: bob to beta&quot;
+  echo &quot;bob say hello to beta&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.102:465
+</code></pre></li>
+
+<li><p>查看 172.16.108.102 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>查看 172.16.108.100 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>查看 172.16.108.103 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>beta 在 MTA3 上查询邮件列表</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user beta@vm3.vm&quot;
+  echo &quot;pass beta&quot;
+  echo &quot;list&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.103:995
+</code></pre></li>
+
+<li><p>alice 在 MTA1 上查看第二封邮件（如果之前按文档进行过 MTA2 的本机测试的话）</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user beta@vm3.vm&quot;
+  echo &quot;pass beta&quot;
+  echo &quot;retr 2&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.103:995
+</code></pre></li>
+</ul>
+
+<h3 id="vm3-vm-vm1-vm">vm3.vm =&gt; vm1.vm</h3>
+
+<ul>
+<li><p>尝试 alpha 通过 MTA3 发送给 alice</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta3&quot;
+  echo &quot;auth login&quot;
+  echo &quot;YWxwaGFAdm0zLnZt&quot;
+  echo &quot;YWxwaGE=&quot;
+  echo &quot;mail from: alpha&quot;
+  echo &quot;rcpt to: alice@vm1.vm&quot;
+  echo &quot;data&quot;
+  echo &quot;from: alpha&quot;
+  echo &quot;to: alice@vm1.vm&quot;
+  echo &quot;subject: alpha to alice&quot;
+  echo &quot;alpha say hello to alice&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.103:465
+</code></pre></li>
+
+<li><p>查看 172.16.108.103 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>查看 172.16.108.100 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>查看 172.16.108.101 上 /var/log/maillog 中相关日志。</p></li>
+
+<li><p>alice 在 MTA1 上查询邮件列表</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user alice@vm1.vm&quot;
+  echo &quot;pass alice&quot;
+  echo &quot;list&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.101:995
+</code></pre></li>
+
+<li><p>alice 在 MTA1 上查看第一封邮件</p>
+
+<pre><code class="language-shell">(
+  echo &quot;user alice@vm1.vm&quot;
+  echo &quot;pass alice&quot;
+  echo &quot;retr 1&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.101:995
+</code></pre></li>
+</ul>
+
+<h2 id="异常操作检查">异常操作检查</h2>
+
+<ul>
+<li><p>尝试无认证跨域发送邮件 [alice =&gt; bob NOT on MTA1]</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta1&quot;
+  echo &quot;mail from: alice&quot;
+  echo &quot;rcpt to: bob@vm2.vm&quot;
+  echo &quot;data&quot;
+  echo &quot;from: alice&quot;
+  echo &quot;to: bob@vm2.vm&quot;
+  echo &quot;subject: alice to bob without auth&quot;
+  echo &quot;alice say hello to bob without auth&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 172.16.108.101:465
+</code></pre></li>
+
+<li><p>尝试无认证本机发送邮件 [alice =&gt; test1 on MTA1]</p>
+
+<pre><code class="language-shell">(
+  echo &quot;ehlo mta1&quot;
+  echo &quot;mail from: alice&quot;
+  echo &quot;rcpt to: test1&quot;
+  echo &quot;data&quot;
+  echo &quot;from: alice&quot;
+  echo &quot;to: test1&quot;
+  echo &quot;subject: alice to test1 without auth&quot;
+  echo &quot;alice say hello to test1 without auth&quot;
+  echo &quot;.&quot;
+  sleep 1
+  echo &quot;quit&quot;
+) | openssl s_client -crlf -connect 127.0.0.1:465
+</code></pre></li>
+</ul>
+
+</div>
+
+
+      <footer>
+  
+<span class="share-box">Share this on:
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-facebook-official "></i></a>
+
+    <a href="https://twitter.com/intent/tweet?text=postfix%20%2b%20dovecot%20%e9%82%ae%e4%bb%b6%e8%bd%ac%e5%8f%91&amp;url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-twitter"></i></a>
+
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-google-plus"></i></a>
+
+    <a href="http://www.reddit.com/submit?url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-reddit"></i></a>
+
+    <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f&amp;title=postfix%20%2b%20dovecot%20%e9%82%ae%e4%bb%b6%e8%bd%ac%e5%8f%91" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"><i class="fa fa-linkedin"></i></a>
+
+    <a href="mailto:?subject=postfix%20%2b%20dovecot%20%e9%82%ae%e4%bb%b6%e8%bd%ac%e5%8f%91&amp;body=Check out this site https%3a%2f%2fyudongliang.cn%2f2019%2f08%2f24%2fpostfix-dovecot-%25E9%2582%25AE%25E4%25BB%25B6%25E8%25BD%25AC%25E5%258F%2591%2f" data-proofer-ignore=""><i class="fa fa-envelope"></i></a>
+  </span>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      
+  
+
+
+</div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//shortname.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+    </div>
+    
+      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+        <div>
+  
+
+    <div class="section">
+      <header><div class="title"><b>最新发布</b></div></header>
+      <div class="content">
+        <ul>
+        
+          <li>
+          <a href="https://yudongliang.cn/2019/08/24/postfix-dovecot-%E9%82%AE%E4%BB%B6%E8%BD%AC%E5%8F%91/">postfix &#43; dovecot 邮件转发</a>
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+
+    
+      
+      
+      <div class="section taxonomies">
+        <header><div class="title"><b>标签</b></div></header>
+
+        <div class="content">
+          <ul>
+            <li><a href="/tags/dovecot">dovecot</a></li><li><a href="/tags/postfix">postfix</a></li>
+          </ul>
+        </div>
+      </div>
+      
+    
+      
+      
+      <div class="section taxonomies">
+        <header><div class="title"><b>话题</b></div></header>
+
+        <div class="content">
+          <ul>
+            <li><a href="/topics/mta">mta</a></li>
+          </ul>
+        </div>
+      </div>
+      
+    
+
+</div>
+
+      </div>
+    
+  </div>
+</div>
+    
+<footer class="footer hidden-print">
+  <div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+           <div class="pull-left">
+  <a class="toplink" href="javascript:" id="return-to-top">回到页首</a>
+</div>
+<div class="pull-right">
+
+<a href="https://yudongliang.cn/www.cirrusgate.com">思睿嘉得</a> <i class='fa fa-site'></i>
+
+</div>
+
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+              
+    
+<div class="container footline">
+    <small>
+</small>
+</div>
+
+
+    
+<div class="container copyright">
+    <small>
+  &copy; 2016 Copyright yudongliang
+
+  </small>
+</div>
+
+
+
+        </div>
+    </div>
+  </div>
+</footer>
+
+    
+
+<script src="//s3.amazonaws.com/mailmunch/static/site.js" id="mailmunch-script" data-mailmunch-site-id="" async="async"></script>
+
+
+
+<script src="//load.sumome.com/" data-sumo-site-id="" async="async"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+var ENABLE_POPOVER =  null , 
+EXPIRE_COOKIE =  null , 
+SHOW_MODAL_TIMEOUT =  null , 
+MOUSE_LEAVE =  null , 
+MODAL_SIZE =  null , 
+POST_URL =  null , 
+SIGNUP_HEADER =  null ,
+HEADER_IMAGE =  null ,
+IMG_DESCRIPTION =  null ,
+SIGNUP_TEXT =  null ,
+INPUT_PLACEHOLDER =  null ,
+SUBMIT_BUTTON =  null ,
+SUCCESS_MESSAGE =  null ,
+ERROR_MESSAGE =  null ,
+OPTIN =  null ,
+COOKIE_NAME =  null ,
+CONTENTLANGUAGE =  null ; 
+</script>
+
+
+
+
+
+
+
+<script  src="https://yudongliang.cn/js/bundle.min.bc5960fdb0e04a2806026a317569a41d3e1757f01180209bb41d2a9b208ff0da68a292a6d35e8917ee58bdc091b1ace06fd1d6aa79350ebc515593615dcdbd75.js" ></script>
+
+
+
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/config/TeX-AMS-MML_HTMLorMML.js"></script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    for(var all in MathJax.Hub.getAllJax()) {
+        all.SourceElement().parentNode.className += ' has-jax';
+
+    }
+});
+</script>
+
+
+
+
+
+  </body>
+</html>
+
