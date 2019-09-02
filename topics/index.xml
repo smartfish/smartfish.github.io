@@ -9,19 +9,9 @@
     <managingEditor>yudongliang@hotmail.com (smartfish)</managingEditor>
     <webMaster>yudongliang@hotmail.com (smartfish)</webMaster>
     <copyright>(c) 2016 Copyright yudongliang</copyright>
-    <lastBuildDate>Sat, 24 Aug 2019 01:54:41 +0800</lastBuildDate>
     
 	<atom:link href="https://yudongliang.cn/topics/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>MTA</title>
-      <link>https://yudongliang.cn/topics/mta/</link>
-      <pubDate>Sat, 24 Aug 2019 01:54:41 +0800</pubDate>
-      <author>yudongliang@hotmail.com (smartfish)</author>
-      <guid>https://yudongliang.cn/topics/mta/</guid>
-      <description></description>
-    </item>
     
   </channel>
 </rss>
