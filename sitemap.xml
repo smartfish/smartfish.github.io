@@ -16,6 +16,27 @@
   </url>
   
   <url>
+    <loc>https://yudongliang.cn/categories/</loc>
+    <lastmod>2020-05-28T17:51:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/tags/hostname/</loc>
+    <lastmod>2020-05-28T17:51:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://yudongliang.cn/categories/mac/</loc>
+    <lastmod>2020-05-28T17:51:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://yudongliang.cn/post/mac_get_hostname/</loc>
     <lastmod>2020-05-28T17:51:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -37,13 +58,8 @@
   </url>
   
   <url>
-    <loc>https://yudongliang.cn/categories/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://yudongliang.cn/tags/</loc>
+    <lastmod>2020-05-28T17:51:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
