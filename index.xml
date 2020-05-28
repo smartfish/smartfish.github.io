@@ -35,8 +35,7 @@
       <pubDate>Thu, 28 May 2020 17:51:49 +0800</pubDate>
       
       <guid>https://yudongliang.cn/post/mac_get_hostname/</guid>
-      <description>&lt;h1 id=&#34;mac-get-hostname&#34;&gt;mac get hostname&lt;/h1&gt;
-&lt;ul&gt;
+      <description>&lt;ul&gt;
 &lt;li&gt;hostname&lt;/li&gt;
 &lt;li&gt;sysctl kern.hostname&lt;/li&gt;
 &lt;li&gt;scutil &amp;ndash;get HostName&lt;/li&gt;
