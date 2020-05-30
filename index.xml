@@ -12,15 +12,6 @@
     
     
     <item>
-      <title>Welcome</title>
-      <link>https://yudongliang.cn/welcome/</link>
-      <pubDate>Thu, 28 May 2020 17:43:00 +0800</pubDate>
-      
-      <guid>https://yudongliang.cn/welcome/</guid>
-      <description>&lt;p&gt;打雷下雨第一篇 :)&lt;/p&gt;</description>
-    </item>
-    
-    <item>
       <title>About</title>
       <link>https://yudongliang.cn/about/</link>
       <pubDate>Thu, 28 May 2020 16:48:52 +0800</pubDate>
@@ -42,6 +33,15 @@
 &lt;li&gt;scutil &amp;ndash;get LocalHostName&lt;/li&gt;
 &lt;li&gt;scutil &amp;ndash;get ComputerName&lt;/li&gt;
 &lt;/ul&gt;</description>
+    </item>
+    
+    <item>
+      <title>Welcome</title>
+      <link>https://yudongliang.cn/post/welcome/</link>
+      <pubDate>Thu, 28 May 2020 17:43:00 +0800</pubDate>
+      
+      <guid>https://yudongliang.cn/post/welcome/</guid>
+      <description>&lt;p&gt;打雷下雨第一篇 :)&lt;/p&gt;</description>
     </item>
     
   </channel>
