@@ -17,7 +17,7 @@
       <pubDate>Thu, 28 May 2020 17:51:49 +0800</pubDate>
       
       <guid>https://yudongliang.cn/post/mac_get_hostname/</guid>
-      <description>1 2 3 4 5  hostname sysctl kern.hostname scutil --get HostName scutil --get LocalHostName scutil --get ComputerName   </description>
+      <description>&lt;p&gt;Mac 下的各种获取主机名的方式。&lt;/p&gt;</description>
     </item>
     
     <item>
