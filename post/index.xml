@@ -17,13 +17,7 @@
       <pubDate>Thu, 28 May 2020 17:51:49 +0800</pubDate>
       
       <guid>https://yudongliang.cn/post/mac_get_hostname/</guid>
-      <description>&lt;ul&gt;
-&lt;li&gt;hostname&lt;/li&gt;
-&lt;li&gt;sysctl kern.hostname&lt;/li&gt;
-&lt;li&gt;scutil &amp;ndash;get HostName&lt;/li&gt;
-&lt;li&gt;scutil &amp;ndash;get LocalHostName&lt;/li&gt;
-&lt;li&gt;scutil &amp;ndash;get ComputerName&lt;/li&gt;
-&lt;/ul&gt;</description>
+      <description>1 2 3 4 5  hostname sysctl kern.hostname scutil --get HostName scutil --get LocalHostName scutil --get ComputerName   </description>
     </item>
     
     <item>
@@ -32,7 +26,7 @@
       <pubDate>Thu, 28 May 2020 17:43:00 +0800</pubDate>
       
       <guid>https://yudongliang.cn/post/welcome/</guid>
-      <description>&lt;p&gt;打雷下雨第一篇 :)&lt;/p&gt;</description>
+      <description>打雷下雨第一篇 :)</description>
     </item>
     
   </channel>
